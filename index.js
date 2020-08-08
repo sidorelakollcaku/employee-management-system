@@ -37,6 +37,7 @@ main = async () => {
                     "Create a new department",
                     "Create a new role",
                     "Add a new employee",
+                    "Update employee role",
                     "Exit"
                 ]
             }
@@ -61,6 +62,9 @@ main = async () => {
                 break;
             case "Add a new employee":
                 createEmployee();
+                break;
+            case "Update employee role":
+                updateEmployeeRole();
                 break;
             case "Exit":
                 connection.end();
@@ -210,6 +214,51 @@ createEmployee = async () => {
 }
 
 
+//Function to update and employee role
+updateEmployeeRole = async () => {
+    try {
+        
+        //Retrieve vallues needed to update employee and store in variables
+        const rolesArr = await getRolesArr();
+        const employeeArr = await getEmployeesArr();
+        
+        const inqRes = await inquirer.prompt([
+            {
+                type: "list",
+                name: "employee",
+                message: "Which employee would you like to update? ",
+                choices: employeeArr
+            },
+            {
+                type: "list",
+                name: "role",
+                message: "What would you like their new role to be? ",
+                choices: rolesArr
+            }       
+        ]);
+        
+        //Get role ID based on selected role
+        const roleId = await getRoleId(inqRes.role);
+        //Get employee ID based on selected employee
+        const employeeId = await getEmployeeId(inqRes.employee);
+        
+        
+        //Update the database based on provided information
+        connection.query("UPDATE employee SET role_id=? WHERE id=?", [roleId, employeeId], function(err, res) {
+            if (err) throw err;
+            console.log("Succesfully updated employee role \n");
+            
+            //Go back to main menu
+            main();
+        });
+    
+    } catch (err) {
+        if (err) throw err;
+    };
+}
+
+
+
 //Function to view all departments
 viewDepartments = () => {
     connection.query('SELECT * FROM department', function(err, res) {
@@ -304,7 +353,6 @@ var getEmployeesArr = () => {
                 res.forEach(element => {
                     employees.push(element.first_name + " " + element.last_name);
               });
-                // console.log(res)
                resolve(employees);
             }
         });       
