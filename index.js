@@ -1,6 +1,8 @@
 var inquirer = require('inquirer');
 var mysql = require('mysql');
 
+
+//Define db connnection
 var connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
@@ -10,6 +12,7 @@ var connection = mysql.createConnection({
 });
 
 
+//Start db connection and notify user with prompt
 connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
@@ -25,16 +28,31 @@ main = () => {
             message: "What would you like to do?",
             name: "mainList",
             choices: [
-                "Add a department",
-                "Add a role",
-                "Add and employee",
+                "Create a new department",
+                "Create a new role",
+                "Add a new employee",
                 "Exit"
             ]
         }
     ]).then((res) => {
-        console.log(res);
-        if (res === "Exit") {
-            connection.end();
+        
+        //Switch statement to handle response
+        switch (res.mainList) {
+            case "View all employees":
+                viewEmployees();
+                break;
+            case "Create a new department":
+                createDepartment();
+                break;
+            case "Create a new role":
+                createRole();
+                break;
+            case "Add a new employee":
+                createEmployee();
+                break;
+            case "Exit":
+                connection.end();
+                break;   
         }
     }).catch(err => {
         if(err.isTtyError) {
@@ -43,4 +61,44 @@ main = () => {
             console.log(err);
           }
     })
+}
+
+
+
+//Function to create a department
+createDepartment = () => {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "deptName",
+            message: "What is the name of the department? "
+        }
+    ]).then( response => {
+        connection.query("INSERT INTO department (name) VALUES (?)", response.deptName, function(err, res) {
+            if (err) throw err;
+            
+            console.log("Succesfully created " + response.deptName + " department.\n");
+            
+            main();
+        });
+        
+    })
+}
+
+
+//Function to create a role
+createRole = () => {
+    
+}
+
+
+//Function to create an employee
+createEmployee = () => {
+    
+}
+
+
+//Function to view all employees
+viewEmployees = () => {
+    
 }
