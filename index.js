@@ -1,5 +1,6 @@
 var inquirer = require('inquirer');
 var mysql = require('mysql');
+var cTable = require('console.table');
 
 
 //Define db connnection
@@ -30,6 +31,7 @@ main = async () => {
                 message: "What would you like to do?",
                 name: "mainList",
                 choices: [
+                    "View all employees",
                     "Create a new department",
                     "Create a new role",
                     "Add a new employee",
@@ -200,12 +202,12 @@ createEmployee = async () => {
 
 //Function to view all employees
 viewEmployees = () => {
-    
+    connection.query('SELECT * FROM employee', function(err, res) {
+        const table = cTable.getTable(res);
+        console.log(table);
+        main();
+    });
 }
-
-
-
-
 
 
 
