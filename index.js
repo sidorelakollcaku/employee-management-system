@@ -31,6 +31,8 @@ main = async () => {
                 message: "What would you like to do?",
                 name: "mainList",
                 choices: [
+                    "View all departments",
+                    "View all roles",
                     "View all employees",
                     "Create a new department",
                     "Create a new role",
@@ -42,6 +44,12 @@ main = async () => {
             
         //Switch statement to handle response
         switch (inqRes.mainList) {
+            case "View all departments":
+                viewDepartments();
+                break;
+            case "View all roles":
+                viewRoles();
+                break;
             case "View all employees":
                 viewEmployees();
                 break;
@@ -138,7 +146,9 @@ createRole = async () => {
 
 //Function to create an employee
 createEmployee = async () => {
-    try {   
+    try {
+        
+        //Retrieve vallues needed to create new employee and store in variables
         const rolesArr = await getRolesArr();
         const employeeArr = await getEmployeesArr();
         employeeArr.push("No Manager");
@@ -197,6 +207,26 @@ createEmployee = async () => {
     } catch (err) {
         if (err) throw err;
     }      
+}
+
+
+//Function to view all departments
+viewDepartments = () => {
+    connection.query('SELECT * FROM department', function(err, res) {
+        const table = cTable.getTable(res);
+        console.log(table);
+        main();
+    });
+}
+
+
+//Function to view all roles
+viewRoles = () => {
+    connection.query('SELECT * FROM role', function(err, res) {
+        const table = cTable.getTable(res);
+        console.log(table);
+        main();
+    });
 }
 
 
